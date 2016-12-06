@@ -1,0 +1,56 @@
+﻿
+<h2>Pregled proizvoda</h2>
+<table id="products" class="table table-bordered">
+    <thead>
+        <tr>
+            <th width="5%">ID</th>
+            <th width="25%">Naziv</th>
+            <th width="40%">Opis</th>
+            <th width="15%">Cijena</th>
+            <th width="15%"></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    var deleteProduct = function (id) {
+        $.ajax({
+            type: "DELETE",
+            url: 'api/products/' + id,
+            success: function (data) {
+                location.reload();
+            }
+        })
+    }
+
+    var updateProduct = function (id) {
+        window.location.href = '/product/update/' + id;
+    }
+
+    $(document).ready(function () {
+        $.ajax({
+            type: "GET",
+            url: '/api/products',
+            success: function (data) {
+                var result = '';
+                if (data.length == 0) {
+                    result = "<tr><td colspan=5><center>Nema pronađenih proizvoda.</center></td><tr>";
+                }
+                else {
+                    $.each(data, function (i, v) {
+                        var row = "<tr>";
+                        row += "<td>" + v.id + "</td>";
+                        row += "<td>" + v.name + "</td>";
+                        row += "<td>" + (v.description==null?'':v.description) + "</td>";
+                        row += "<td>" + parseFloat(v.price).toFixed(2) + " kn" + "</td>";
+                        row += "<td><a href='javascript:updateProduct(" + v.id + ")' class='btn btn-primary mr5' role='button'>Uredi</a><a href='javascript:deleteProduct(" + v.id + ")' class='btn btn-default' role='button'>Obriši</a></td>"
+                        row += "</tr>";
+                        result += row;
+                    });
+                }
+                $('#products tbody').html(result);
+            }
+        })
+    });
+</script>

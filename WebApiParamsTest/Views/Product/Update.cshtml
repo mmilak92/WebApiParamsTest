@@ -1,0 +1,85 @@
+﻿
+@{
+    ViewBag.Title = "Uredi proizvod";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Uredi proizvod</h2>
+<div class="alert alert-danger" id="error">
+    <strong>Pogreška!</strong> Proizvod nije pronađen.
+</div>
+<form class="form-horizontal" id="update-product">
+    <input type="hidden" id="id" name="id" value="@ViewBag.Id" />
+    <div class="form-group">
+        <label class="control-label col-md-2" for="name">Naziv:</label>
+        <div class="col-md-10">
+            <input class="form-control" id="name" name="name" placeholder="Unesite naziv proizvoda">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2" for="price">Cijena:</label>
+        <div class="col-md-10">
+            <input type='number' step='0.01' value='0.00' min="0" placeholder='0.00' class="form-control price" id="price" name="price">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2" for="description">Opis:</label>
+        <div class="col-md-10">
+            <textarea id="description" class="form-control" placeholder="Unesite opis proizvoda" name="description"></textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <button type="submit" class="btn btn-default" id="save-product">Spremi</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function () {
+        $('#error').hide();
+
+        $.ajax({
+            type: "GET",
+            url: '/api/products/'+$('#id').val(),
+            success: function (data) {
+                $('#name').val(data.name);
+                $('#price').val(data.price);
+                $('#description').val(data.description);
+            },
+            error: function () {
+                $('#error').show();
+                $('form').hide();
+
+            }
+        })
+
+        $("#update-product").on("submit", function (event) {
+            event.preventDefault();
+
+            var product = {
+                id: $('#id').val(),
+                name: $('#name').val(),
+                price: $('#price').val(),
+                description: $('#description').val()
+            };
+
+            if (product.name == '') {
+                $('#name').parent().addClass('has-error');
+                return false;
+            }
+            else {
+                $('#name').parent().removeClass('has-error');
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '/api/products',
+                data:product,
+                success: function (data) {
+                    window.location.href = '/';
+                }
+            })
+        });
+    });
+</script>
